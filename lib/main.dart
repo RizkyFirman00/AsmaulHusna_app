@@ -1,6 +1,6 @@
-import 'package:asmaul_husna/bookmark/bookmark_page.dart';
-import 'package:asmaul_husna/home/home_page.dart';
-import 'package:asmaul_husna/hijaiyah/hijaiyah_page.dart';
+import 'package:asmaul_husna/view/bookmark/bookmark_page.dart';
+import 'package:asmaul_husna/view/home/home_page.dart';
+import 'package:asmaul_husna/view/hijaiyah/hijaiyah_page.dart';
 import 'package:flutter/material.dart';
 import 'splash_screen.dart'; // Import the splash screen
 
@@ -13,7 +13,7 @@ class MySplashApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(), // Start with the splash screen
+      home: SplashScreen(),
     );
   }
 }
@@ -48,34 +48,37 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
         scaffoldBackgroundColor: Colors.white,
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(backgroundColor: Color(0xffffb6b9)),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+            backgroundColor: Color(0xffffb6b9)),
         cardTheme: const CardTheme(surfaceTintColor: Colors.white),
-        dialogTheme: const DialogTheme(surfaceTintColor: Colors.white, backgroundColor: Colors.white),
+        dialogTheme: const DialogTheme(
+            surfaceTintColor: Colors.white, backgroundColor: Colors.white),
       ),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color(0xff4caf50), // Green color for the app bar
-          title: const Row(
-            children: [
-              Image(
-                image: AssetImage('assets/images/ic_logo.png'),
-                height: 50,
-                width: 50,
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              Text(
-                "Asmaul Husna",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+          title: Padding(
+            padding: const EdgeInsets.only(left: 5),
+            child: Row(
+              children: [
+                Image.asset(
+                  "assets/images/ic_logo.png",
+                  width: 30,
+                  height: 30,
                 ),
-              ),
-            ],
+                SizedBox(
+                  width: 10,
+                ),
+                Text("Asmaul Husna",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+              ],
+            ),
           ),
+          actions: [Padding(
+            padding: const EdgeInsets.only(right: 5),
+            child: IconButton(onPressed: () {}, icon: Icon(Icons.logout)),
+          )],
+          backgroundColor: const Color(0xff4caf50),
           bottom: setTabBar(),
         ),
         body: TabBarView(
@@ -94,20 +97,20 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     return TabBar(
       controller: tabController,
       labelColor: Colors.white,
-      unselectedLabelColor: Colors.black26,
+      unselectedLabelColor: Colors.white.withOpacity(0.3),
       indicatorColor: Colors.white,
       tabs: const [
         Tab(
           text: "Home",
-          icon: Icon(Icons.menu_book),
+          icon: Icon(Icons.library_books_rounded),
         ),
         Tab(
           text: "Hijaiyah",
-          icon: Icon(Icons.settings),
+          icon: Icon(Icons.text_fields_rounded),
         ),
         Tab(
-          text: "Bookmark",
-          icon: Icon(Icons.bookmarks_outlined),
+          text: "Favorite",
+          icon: Icon(Icons.star_rounded),
         ),
       ],
     );

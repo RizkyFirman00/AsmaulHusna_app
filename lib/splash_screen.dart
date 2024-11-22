@@ -1,5 +1,5 @@
+import 'package:asmaul_husna/view/login/login_page.dart';
 import 'package:flutter/material.dart';
-import 'main.dart';  // Import the main.dart where MyApp is defined
 import 'dart:async';
 
 class SplashScreen extends StatefulWidget {
@@ -14,7 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(Duration(seconds: 3), () {
       // Navigate to the main app after the splash screen
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => MyApp()), // Navigate to MyApp widget
+        MaterialPageRoute(builder: (context) => const LoginPage()), // Navigate to MyApp widget
       );
     });
   }
@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color(0xff8ac6d1),
+                color: Colors.white,
               ),
             ),
           ],
