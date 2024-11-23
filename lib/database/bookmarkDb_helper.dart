@@ -1,10 +1,24 @@
+import 'package:asmaul_husna/database/base_db_helper.dart';
 import 'package:asmaul_husna/model/model_bookmark.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-class BookmarkDbHelper {
+class BookmarkDbHelper extends BaseDbHelper {
   static final BookmarkDbHelper _instance = BookmarkDbHelper._internal();
   static Database? _database;
+
+  @override
+  Future<void> onCreate(Database db, int version) async {
+    await db.execute('''
+      CREATE TABLE $tableName (
+        $columnId INTEGER PRIMARY KEY,
+        $columnEmail TEXT NOT NULL UNIQUE,
+        $columnPhoneNumber TEXT,
+        $columnUsername TEXT NOT NULL,
+        $columnPassword TEXT NOT NULL
+      )
+    ''');
+  }
 
   //inisialisasi beberapa variabel yang dibutuhkan
   final String tableName = 'tbl_bookmark';

@@ -1,6 +1,7 @@
 import 'package:asmaul_husna/view/bookmark/bookmark_page.dart';
 import 'package:asmaul_husna/view/home/home_page.dart';
 import 'package:asmaul_husna/view/hijaiyah/hijaiyah_page.dart';
+import 'package:asmaul_husna/view/login/login_page.dart';
 import 'package:flutter/material.dart';
 import 'splash_screen.dart'; // Import the splash screen
 
@@ -70,14 +71,22 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
                   width: 10,
                 ),
                 Text("Asmaul Husna",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+                    style:
+                        TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
               ],
             ),
           ),
-          actions: [Padding(
-            padding: const EdgeInsets.only(right: 5),
-            child: IconButton(onPressed: () {}, icon: Icon(Icons.logout)),
-          )],
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 5),
+              child: IconButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => LoginPage()));
+                  },
+                  icon: Icon(Icons.logout)),
+            )
+          ],
           backgroundColor: const Color(0xff4caf50),
           bottom: setTabBar(),
         ),

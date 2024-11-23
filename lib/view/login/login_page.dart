@@ -1,3 +1,6 @@
+import 'package:asmaul_husna/database/user_db_helper.dart';
+import 'package:asmaul_husna/main.dart';
+import 'package:asmaul_husna/view/register/register_page.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -8,12 +11,39 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  UserDbHelper userDbHelper = UserDbHelper();
+
+  Future<void> _loginUser() async {
+    String username = _usernameController.text.trim();
+    String password = _passwordController.text.trim();
+
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please enter both username and password")),
+      );
+      return;
+    }
+
+    var result = await userDbHelper.loginUser(username, password);
+
+    if (result != null) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => MyApp()));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Username atau Password salah")));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 30,
+        toolbarHeight: 20,
         elevation: 0, // Tidak ada bayangan pada AppBar
         backgroundColor: Color(0xff4caf50), // Warna AppBar sesuai dengan tema
       ),
@@ -74,66 +104,76 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextFormField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide(color: Color(0xff4caf50), width: 2),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide(color: Color(0xff4caf50), width: 2),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide(color: Color(0xff4caf50), width: 2),
-                          ),
-                          labelText: "Username",
-                          labelStyle: TextStyle(
-                            color: Color(0xff4caf50)
-                          )
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      TextFormField(
+                        controller: _usernameController,
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(color: Color(0xff4caf50), width: 2),
+                              borderSide: BorderSide(
+                                  color: Color(0xff4caf50), width: 2),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(color: Color(0xff4caf50), width: 2),
+                              borderSide: BorderSide(
+                                  color: Color(0xff4caf50), width: 2),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(color: Color(0xff4caf50), width: 2),
+                              borderSide: BorderSide(
+                                  color: Color(0xff4caf50), width: 2),
+                            ),
+                            labelText: "Username",
+                            labelStyle: TextStyle(color: Color(0xff4caf50))),
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide(
+                                  color: Color(0xff4caf50), width: 2),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide(
+                                  color: Color(0xff4caf50), width: 2),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide(
+                                  color: Color(0xff4caf50), width: 2),
                             ),
                             labelText: "Password",
-                            labelStyle: TextStyle(
-                                color: Color(0xff4caf50)
-                            )
-                        ),
+                            labelStyle: TextStyle(color: Color(0xff4caf50))),
                       ),
                       SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                              child: ElevatedButton(
-                            onPressed: () {},
-                            child: Text("Register"),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    WidgetStatePropertyAll(Colors.white),
-                                foregroundColor:
-                                    WidgetStatePropertyAll(Color(0xff4caf50))),
-                          )),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => RegisterPage()));
+                              },
+                              child: Text("Register"),
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      WidgetStatePropertyAll(Colors.white),
+                                  foregroundColor: WidgetStatePropertyAll(
+                                      Color(0xff4caf50))),
+                            ),
+                          ),
                           SizedBox(
                             width: 10,
                           ),
                           Expanded(
                               child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              _loginUser();
+                            },
                             child: Text("Login"),
                             style: ButtonStyle(
                               backgroundColor:
