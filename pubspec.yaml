@@ -15,11 +15,21 @@ dependencies:
   path: ^1.8.0
   flutter_svg: ^2.0.10+1
   audioplayers: ^6.0.0
+  hive: ^2.0.5
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  hive_generator: ^1.1.1
+  build_runner: ^2.3.3
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/ic_logo.png"
 
 flutter:
   uses-material-design: true
@@ -27,5 +37,5 @@ flutter:
   assets:
     - assets/data/
     - assets/images/
-    - assets/sounds/
+#    - assets/sounds/
     - assets/splash_screen.png

@@ -1,14 +1,19 @@
 import 'package:asmaul_husna/model/model_bookmark.dart';
-import 'package:asmaul_husna/database/bookmarkDb_helper.dart';
+import 'package:asmaul_husna/database/instances/bookmark_db_helper.dart';
 import 'package:flutter/material.dart';
 
 class DetailHomePage extends StatefulWidget {
-  final String strNo, strMeaning, strName, strTranslate, strKeterangan, strAmalan;
+  final String strMeaning, strName, strTranslate, strKeterangan, strAmalan;
+  final int strNo;
 
   const DetailHomePage(
-      {super.key, required this.strNo, required this.strMeaning,
-        required this.strName, required this.strTranslate, required this.strKeterangan,
-        required this.strAmalan});
+      {super.key,
+      required this.strMeaning,
+      required this.strName,
+      required this.strTranslate,
+      required this.strKeterangan,
+      required this.strAmalan,
+      required this.strNo});
 
   @override
   State<DetailHomePage> createState() => _DetailHomePageState();
@@ -18,7 +23,8 @@ class _DetailHomePageState extends State<DetailHomePage> {
   bool isFlagged = false;
   List<ModelBookmark> listBookmark = [];
   BookmarkDbHelper databaseHelper = BookmarkDbHelper();
-  String? strNo, strMeaning, strName, strTranslate, strKeterangan, strAmalan;
+  late int strNo;
+  String? strMeaning, strName, strTranslate, strKeterangan, strAmalan;
 
   @override
   initState() {
@@ -53,9 +59,7 @@ class _DetailHomePageState extends State<DetailHomePage> {
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
                   strTranslate!,
-                  style: const TextStyle(
-                      fontSize: 20
-                  ),
+                  style: const TextStyle(fontSize: 20),
                 ),
                 titlePadding: const EdgeInsets.only(left: 52.0, bottom: 16.0),
                 background: Image.asset(
@@ -79,16 +83,15 @@ class _DetailHomePageState extends State<DetailHomePage> {
                   child: Text(
                     strName!,
                     style: const TextStyle(
-                        fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black
-                    ),
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
                   ),
                 ),
                 Center(
                   child: Text(
                     strTranslate!,
-                    style: const TextStyle(
-                        fontSize: 18, color: Colors.black
-                    ),
+                    style: const TextStyle(fontSize: 18, color: Colors.black),
                   ),
                 ),
                 const SizedBox(
@@ -96,9 +99,7 @@ class _DetailHomePageState extends State<DetailHomePage> {
                 ),
                 Text(
                   strKeterangan!,
-                  style: const TextStyle(
-                      fontSize: 16, color: Colors.black
-                  ),
+                  style: const TextStyle(fontSize: 16, color: Colors.black),
                 ),
                 const SizedBox(
                   height: 20,
@@ -106,9 +107,7 @@ class _DetailHomePageState extends State<DetailHomePage> {
                 Text(
                   strAmalan!,
                   textAlign: TextAlign.justify,
-                  style: const TextStyle(
-                      fontSize: 16, color: Colors.black
-                  ),
+                  style: const TextStyle(fontSize: 16, color: Colors.black),
                 ),
               ],
             ),
@@ -117,29 +116,34 @@ class _DetailHomePageState extends State<DetailHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color(0xffFF4caf50),
-
-        onPressed: () {
+        onPressed: () async {
           bool isTapped = false;
-          setState(() async {
-            isFlagged = !isFlagged;
-            if (!isTapped) {
-              isTapped = true;
 
-              databaseHelper.saveData(ModelBookmark(
-                number: strNo,
-                name: strName,
-                transliteration: strTranslate,
-                meaning: strMeaning,
-                keterangan: strKeterangan,
-                amalan: strAmalan,
-                flag: 'Y',
-              ));
+          if (!isTapped) {
+            isTapped = true;
 
-              Navigator.pop(context);
-              
-              isTapped = false;
+            setState(() {
+              isFlagged = !isFlagged;
+            });
+
+            if (isFlagged) {
+              await databaseHelper.saveData(
+                ModelBookmark(
+                  number: strNo,
+                  name: strName,
+                  transliteration: strTranslate,
+                  meaning: strMeaning,
+                  keterangan: strKeterangan,
+                  amalan: strAmalan,
+                  flag: 'Y',
+                ),
+              );
+            } else {
+              await databaseHelper.deleteBookmarkByNumber(strNo);
             }
-          });
+            Navigator.pop(context);
+            isTapped = false;
+          }
         },
         child: Icon(
           Icons.star_rounded,

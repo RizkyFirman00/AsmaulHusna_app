@@ -1,10 +1,8 @@
 import 'dart:math';
-
 import 'package:asmaul_husna/model/model_bookmark.dart';
-import 'package:asmaul_husna/database/bookmarkDb_helper.dart';
+import 'package:asmaul_husna/database/instances/bookmark_db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import '../home/detail_home_page.dart';
 
 class BookmarkPage extends StatefulWidget {
@@ -15,201 +13,159 @@ class BookmarkPage extends StatefulWidget {
 }
 
 class _BookmarkPageState extends State<BookmarkPage> {
-  List<ModelBookmark> listBookmark = [];
-  BookmarkDbHelper databaseHelper = BookmarkDbHelper();
-  int strCheckDatabase = 0;
+  final BookmarkDbHelper _databaseHelper = BookmarkDbHelper();
+  List<ModelBookmark> _listBookmarks = [];
+  bool _isEmpty = true;
 
   @override
   void initState() {
     super.initState();
-    getDatabase();
-    getAllData();
+    _loadBookmarks();
   }
 
-  //cek database ada data atau tidak
-  Future<void> getDatabase() async {
-    var checkDB = await databaseHelper.cekDataBookmark();
+  // Load bookmarks and check if database contains data
+  Future<void> _loadBookmarks() async {
+    final bookmarks = await _databaseHelper.getAllBookmarks();
+    final filteredBookmarks = bookmarks.where((bookmark) => bookmark.number! >= 0).toList();
     setState(() {
-      if (checkDB == 0) {
-        strCheckDatabase = 0;
-      } else {
-        strCheckDatabase = checkDB!;
-      }
+      _listBookmarks = filteredBookmarks;
+      _isEmpty = _listBookmarks.isEmpty;
     });
   }
 
-  //get data untuk menampilkan ke listview
-  Future<void> getAllData() async {
-    var listData = await databaseHelper.getDataBookmark();
+  // Delete a bookmark and update the UI
+  Future<void> _deleteBookmark(ModelBookmark bookmark, int index) async {
+    await _databaseHelper.deleteBookmarkByNumber(bookmark.number!);
+    print("BOOKMARK DIAPUS: ${bookmark.number}");
     setState(() {
-      listBookmark.clear();
-      listData!.forEach((data) {
-        listBookmark.add(ModelBookmark.fromMap(data));
-      });
+      _listBookmarks.removeAt(index);
+      _isEmpty = _listBookmarks.isEmpty;
     });
+  }
+
+  Color _getRandomColor() {
+    final random = Random();
+    return Color.fromARGB(255, random.nextInt(200), random.nextInt(200), random.nextInt(200));
   }
 
   @override
   Widget build(BuildContext context) {
-    Color getRandomColor() {
-      Random random = Random();
-      return Color.fromARGB(255, random.nextInt(200), random.nextInt(200), random.nextInt(200));
-    }
-
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            strCheckDatabase == 0
-                ? Container(
-                padding: const EdgeInsets.only(top: 250),
-                child: const Center(
-                  child: Text("Ups, belum ada bookmark.",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
+      body: _isEmpty
+          ? Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 250),
+          child: const Text(
+            "Ups, belum ada bookmark.",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        ),
+      )
+          : ListView.builder(
+        itemCount: _listBookmarks.length,
+        itemBuilder: (context, index) {
+          final bookmark = _listBookmarks[index];
+          return GestureDetector(
+            onLongPress: () => _showDeleteDialog(bookmark, index),
+            onTap: () => _navigateToDetail(bookmark),
+            child: Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              elevation: 5,
+              margin: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: SvgPicture.asset(
+                            'assets/images/no.svg',
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Positioned(
+                          child: Text(
+                            bookmark.number.toString(),
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ))
-                : ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: listBookmark.length,
-                itemBuilder: (context, index) {
-                  ModelBookmark modelbookmark = listBookmark[index];
-                  return GestureDetector(
-                    onLongPress: () {
-                      AlertDialog alertDialog = AlertDialog(
-                        title: const Text("Hapus Data",
-                          style: TextStyle(fontSize: 18, color: Colors.black),
-                        ),
-                        content: const SizedBox(
-                          height: 20,
-                          child: Column(
-                            children: [
-                              Text("Yakin hapus data ini?",
-                                style: TextStyle(fontSize: 14, color: Colors.black),
-                              )
-                            ],
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              deleteData(modelbookmark, index);
-                              Navigator.of(context, rootNavigator: true).pop();
-                            },
-                            child: const Text("Hapus",
-                              style: TextStyle(fontSize: 14, color: Colors.black),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context, rootNavigator: true).pop();
-                            },
-                            child: const Text("Batal",
-                              style: TextStyle(fontSize: 14, color: Colors.black),
-                            ),
-                          ),
-                        ],
-                      );
-                      showDialog(
-                          context: context,
-                          builder: (context) => alertDialog);
-                    },
-                    onTap: () {
-                      String strNo = listBookmark[index].number.toString();
-                      String strMeaning = listBookmark[index].meaning.toString();
-                      String strName = listBookmark[index].name.toString();
-                      String strTranslate = listBookmark[index].transliteration.toString();
-                      String strKeterangan = listBookmark[index].keterangan.toString();
-                      String strAmalan = listBookmark[index].amalan.toString();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailHomePage(
-                              strNo: strNo,
-                              strMeaning: strMeaning,
-                              strName: strName,
-                              strTranslate: strTranslate,
-                              strKeterangan: strKeterangan,
-                              strAmalan: strAmalan),
-                        ),
-                      );
-                    },
-                    child: Card(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      elevation: 5,
-                      margin: const EdgeInsets.all(10),
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(100),
-                                  child: SvgPicture.asset(
-                                    'assets/images/no.svg',
-                                    width: 50,
-                                    height: 50,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                Positioned(
-                                  child: Text(
-                                    modelbookmark.number.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              children: [
-                                ListTile(
-                                  title: Text(
-                                    modelbookmark.transliteration.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  subtitle: Text(
-                                    modelbookmark.meaning.toString(),
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: Text(
-                              modelbookmark.name.toString(),
-                              style: TextStyle(fontSize: 24, color: getRandomColor()),
-                            ),
-                          ),
-                        ],
+                  Expanded(
+                    child: ListTile(
+                      title: Text(
+                        bookmark.transliteration ?? '',
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        bookmark.meaning ?? '',
+                        style: const TextStyle(fontSize: 12),
                       ),
                     ),
-                  );
-                }),
-          ],
-        ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: Text(
+                      bookmark.name ?? '',
+                      style: TextStyle(fontSize: 24, color: _getRandomColor()),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  //untuk hapus data berdasarkan Id
-  Future<void> deleteData(ModelBookmark modelBookmark, int position) async {
-    await databaseHelper.deleteBookmark(modelBookmark.id!);
-    setState(() {
-      getDatabase();
-      listBookmark.removeAt(position);
+  // Show delete confirmation dialog
+  void _showDeleteDialog(ModelBookmark bookmark, int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Hapus Data", style: TextStyle(fontSize: 18)),
+        content: const Text("Yakin hapus data ini?", style: TextStyle(fontSize: 14)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              print("BOOKMARK DIAPUS: ${index}");
+              _deleteBookmark(bookmark, index);
+              Navigator.pop(context);
+            },
+            child: const Text("Hapus", style: TextStyle(fontSize: 14)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal", style: TextStyle(fontSize: 14)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Navigate to detail page
+  void _navigateToDetail(ModelBookmark bookmark) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetailHomePage(
+          strNo: bookmark.number!,
+          strMeaning: bookmark.meaning ?? '',
+          strName: bookmark.name ?? '',
+          strTranslate: bookmark.transliteration ?? '',
+          strKeterangan: bookmark.keterangan ?? '',
+          strAmalan: bookmark.amalan ?? '',
+        ),
+      ),
+    ).then((_) {
+      _loadBookmarks();
     });
   }
 }

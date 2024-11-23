@@ -1,9 +1,7 @@
-import 'package:asmaul_husna/database/user_db_helper.dart';
+import 'package:asmaul_husna/database/instances/user_db_helper.dart';
 import 'package:asmaul_husna/model/model_user.dart';
 import 'package:asmaul_husna/view/login/login_page.dart';
 import 'package:flutter/material.dart';
-
-import '../../main.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -18,9 +16,13 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  UserDbHelper userDbHelper = UserDbHelper();
+  final _formKey = GlobalKey<FormState>();
+
+  final UserDbHelper _userDbHelper = UserDbHelper();
 
   Future<void> _registerUser() async {
+    if (!_formKey.currentState!.validate()) return;
+
     String email = _emailController.text.trim();
     String phone = _phoneController.text.trim();
     String username = _usernameController.text.trim();
@@ -37,7 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
         username.isEmpty ||
         password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in all fields")),
+        const SnackBar(content: Text("Tolong isi semua data")),
       );
       return;
     }
@@ -46,18 +48,18 @@ class _RegisterPageState extends State<RegisterPage> {
         phone.isNotEmpty &&
         username.isNotEmpty &&
         password.isNotEmpty) {
-      String result = await userDbHelper.registerUser(modelUser);
+      var result = await _userDbHelper.registerUser(modelUser);
 
-      if (result == 'Registration successful') {
+      if (result) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Registration successful!")),
+          const SnackBar(content: Text("Registration Berhasil!")),
         );
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => LoginPage()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result)),
+          SnackBar(content: Text("Registration Gagal!")),
         );
       }
     }
@@ -128,138 +130,94 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Container(
                       padding: EdgeInsets.only(top: 10, left: 20, right: 20),
                       margin: EdgeInsets.only(bottom: 20),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextFormField(
-                            controller: _emailController,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(
-                                      color: Color(0xff4caf50), width: 2),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(
-                                      color: Color(0xff4caf50), width: 2),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(
-                                      color: Color(0xff4caf50), width: 2),
-                                ),
-                                labelText: "Email",
-                                labelStyle:
-                                    TextStyle(color: Color(0xff4caf50))),
-                          ),
-                          SizedBox(height: 20),
-                          TextFormField(
-                            controller: _phoneController,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(
-                                      color: Color(0xff4caf50), width: 2),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(
-                                      color: Color(0xff4caf50), width: 2),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(
-                                      color: Color(0xff4caf50), width: 2),
-                                ),
-                                labelText: "Phone Number",
-                                labelStyle:
-                                    TextStyle(color: Color(0xff4caf50))),
-                          ),
-                          SizedBox(height: 20),
-                          TextFormField(
-                            controller: _usernameController,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(
-                                      color: Color(0xff4caf50), width: 2),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(
-                                      color: Color(0xff4caf50), width: 2),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(
-                                      color: Color(0xff4caf50), width: 2),
-                                ),
-                                labelText: "Username",
-                                labelStyle:
-                                    TextStyle(color: Color(0xff4caf50))),
-                          ),
-                          SizedBox(height: 20),
-                          TextFormField(
-                            controller: _passwordController,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(
-                                      color: Color(0xff4caf50), width: 2),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(
-                                      color: Color(0xff4caf50), width: 2),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(
-                                      color: Color(0xff4caf50), width: 2),
-                                ),
-                                labelText: "Password",
-                                labelStyle:
-                                    TextStyle(color: Color(0xff4caf50))),
-                          ),
-                          SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    _registerUser();
-                                  },
-                                  child: Text("Register"),
-                                  style: ButtonStyle(
-                                      backgroundColor: WidgetStatePropertyAll(
-                                          Color(0xff4caf50)),
-                                      foregroundColor:
-                                          WidgetStatePropertyAll(Colors.white)),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Expanded(
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextFormField(
+                              controller: _emailController,
+                              decoration: _inputDecoration("Email"),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Password tidak boleh kosong";
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            TextFormField(
+                              controller: _phoneController,
+                              decoration: _inputDecoration("Phone Number"),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Password tidak boleh kosong";
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            TextFormField(
+                              controller: _usernameController,
+                              decoration: _inputDecoration("Username"),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Password tidak boleh kosong";
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            TextFormField(
+                              controller: _passwordController,
+                              decoration: _inputDecoration("Password"),
+                              obscureText: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Password tidak boleh kosong";
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
                                   child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (context) => LoginPage()));
-                                },
-                                child: Text("Login"),
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      WidgetStatePropertyAll(Colors.white),
-                                  foregroundColor:
-                                      WidgetStatePropertyAll(Color(0xff4caf50)),
+                                    onPressed: () {
+                                      _registerUser();
+                                    },
+                                    child: Text("Register"),
+                                    style: ButtonStyle(
+                                        backgroundColor: WidgetStatePropertyAll(
+                                            Color(0xff4caf50)),
+                                        foregroundColor:
+                                            WidgetStatePropertyAll(Colors.white)),
+                                  ),
                                 ),
-                              ))
-                            ],
-                          )
-                        ],
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                    child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) => LoginPage()));
+                                  },
+                                  child: Text("Login"),
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        WidgetStatePropertyAll(Colors.white),
+                                    foregroundColor:
+                                        WidgetStatePropertyAll(Color(0xff4caf50)),
+                                  ),
+                                ))
+                              ],
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -277,6 +235,25 @@ class _RegisterPageState extends State<RegisterPage> {
           ],
         ),
       ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: Color(0xff4caf50), width: 2),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: Color(0xff4caf50), width: 2),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: Color(0xff4caf50), width: 2),
+      ),
+      labelText: label,
+      labelStyle: const TextStyle(color: Color(0xff4caf50)),
     );
   }
 }

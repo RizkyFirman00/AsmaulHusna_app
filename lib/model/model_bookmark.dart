@@ -1,42 +1,41 @@
-class ModelBookmark {
+import 'package:hive/hive.dart';
+
+part 'model_bookmark.g.dart';
+
+@HiveType(typeId: 1)
+class ModelBookmark extends HiveObject {
+  @HiveField(0)
   int? id;
-  String? number;
+
+  @HiveField(1)
+  int? number;
+
+  @HiveField(2)
   String? name;
+
+  @HiveField(3)
   String? transliteration;
+
+  @HiveField(4)
   String? meaning;
+
+  @HiveField(5)
   String? flag;
+
+  @HiveField(6)
   String? keterangan;
+
+  @HiveField(7)
   String? amalan;
 
-  ModelBookmark({this.id, this.number, this.name,
-    this.transliteration, this.meaning, this.flag,
-    this.keterangan, this.amalan});
-
-  Map<String, dynamic> toMap() {
-    var map = <String, dynamic>{};
-    if (id != null) {
-      map['id'] = id;
-    }
-    map['number'] = number;
-    map['name'] = name;
-    map['translate'] = transliteration;
-    map['meaning'] = meaning;
-    map['flag'] = flag;
-    map['keterangan'] = keterangan;
-    map['amalan'] = amalan;
-
-    return map;
-  }
-
-  ModelBookmark.fromMap(Map<String, dynamic> map) {
-    id = map['id'];
-    number = map['number'];
-    name = map['name'];
-    transliteration = map['translate'];
-    meaning = map['meaning'];
-    flag = map['flag'];
-    keterangan = map['keterangan'];
-    amalan = map['amalan'];
-  }
-
+  ModelBookmark({
+    this.id,
+    this.number,
+    this.name,
+    this.transliteration,
+    this.meaning,
+    this.flag,
+    this.keterangan,
+    this.amalan,
+  });
 }

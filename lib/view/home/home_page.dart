@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
-                            String strNo = items[index].number.toString();
+                            int? strNo = items[index].number;
                             String strMeaning = items[index].meaning.toString();
                             String strName = items[index].name.toString();
                             String strTranslate = items[index].transliteration.toString();
@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => DetailHomePage(
-                                    strNo: strNo,
+                                    strNo: strNo!,
                                     strMeaning: strMeaning,
                                     strName: strName,
                                     strTranslate: strTranslate,

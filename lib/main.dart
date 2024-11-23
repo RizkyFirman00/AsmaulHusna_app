@@ -1,11 +1,21 @@
+import 'package:asmaul_husna/model/model_bookmark.dart';
+import 'package:asmaul_husna/model/model_user.dart';
 import 'package:asmaul_husna/view/bookmark/bookmark_page.dart';
 import 'package:asmaul_husna/view/home/home_page.dart';
 import 'package:asmaul_husna/view/hijaiyah/hijaiyah_page.dart';
 import 'package:asmaul_husna/view/login/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'splash_screen.dart'; // Import the splash screen
 
-void main() {
+Future<void> main() async {
+  await Hive.initFlutter();
+
+  // Register adaptor
+  Hive.registerAdapter(ModelUserAdapter());
+  Hive.registerAdapter(ModelBookmarkAdapter());
+
   runApp(MySplashApp());
 }
 

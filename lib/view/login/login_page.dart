@@ -1,4 +1,4 @@
-import 'package:asmaul_husna/database/user_db_helper.dart';
+import 'package:asmaul_husna/database/instances/user_db_helper.dart';
 import 'package:asmaul_husna/main.dart';
 import 'package:asmaul_husna/view/register/register_page.dart';
 import 'package:flutter/material.dart';
@@ -13,28 +13,27 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final UserDbHelper _userDbHelper = UserDbHelper();
 
-  UserDbHelper userDbHelper = UserDbHelper();
+  final _formKey = GlobalKey<FormState>();
 
   Future<void> _loginUser() async {
+    if (!_formKey.currentState!.validate()) return;
+
     String username = _usernameController.text.trim();
     String password = _passwordController.text.trim();
 
-    if (username.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please enter both username and password")),
-      );
-      return;
-    }
+    var result = await _userDbHelper.loginUser(username, password);
 
-    var result = await userDbHelper.loginUser(username, password);
-
-    if (result != null) {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => MyApp()));
+    if (result) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MyApp()));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Selamat Datang $username')));
     } else {
+      _usernameController.text = "";
+      _passwordController.text = "";
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Username atau Password salah")));
+        SnackBar(content: Text('Username atau Password salah')),
+      );
     }
   }
 
@@ -44,8 +43,8 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 20,
-        elevation: 0, // Tidak ada bayangan pada AppBar
-        backgroundColor: Color(0xff4caf50), // Warna AppBar sesuai dengan tema
+        elevation: 0,
+        backgroundColor: const Color(0xff4caf50),
       ),
       body: SafeArea(
         child: Stack(
@@ -55,13 +54,15 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Expanded(
                   child: Container(
-                    padding: EdgeInsets.only(left: 20, right: 20),
-                    margin: EdgeInsets.only(bottom: 60),
-                    decoration: BoxDecoration(
-                        color: Color(0xff4caf50),
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(25),
-                            bottomRight: Radius.circular(200))),
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    margin: const EdgeInsets.only(bottom: 50),
+                    decoration: const BoxDecoration(
+                      color: Color(0xff4caf50),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(25),
+                        bottomRight: Radius.circular(200),
+                      ),
+                    ),
                     width: MediaQuery.of(context).size.width,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,21 +76,23 @@ class _LoginPageState extends State<LoginPage> {
                           children: [
                             Text(
                               isKeyboardOpen ? "" : "ASMAUL",
-                              style: TextStyle(
-                                  fontSize: 78,
-                                  wordSpacing: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
+                              style: const TextStyle(
+                                fontSize: 78,
+                                wordSpacing: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                             Positioned(
                               top: 75,
                               child: Text(
                                 isKeyboardOpen ? "" : "HUSNA",
-                                style: TextStyle(
-                                    fontSize: 64,
-                                    wordSpacing: 2,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white),
+                                style: const TextStyle(
+                                  fontSize: 64,
+                                  wordSpacing: 2,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ],
@@ -99,98 +102,79 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextFormField(
-                        controller: _usernameController,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(
-                                  color: Color(0xff4caf50), width: 2),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(
-                                  color: Color(0xff4caf50), width: 2),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(
-                                  color: Color(0xff4caf50), width: 2),
-                            ),
-                            labelText: "Username",
-                            labelStyle: TextStyle(color: Color(0xff4caf50))),
-                      ),
-                      SizedBox(height: 20),
-                      TextFormField(
-                        controller: _passwordController,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(
-                                  color: Color(0xff4caf50), width: 2),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(
-                                  color: Color(0xff4caf50), width: 2),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(
-                                  color: Color(0xff4caf50), width: 2),
-                            ),
-                            labelText: "Password",
-                            labelStyle: TextStyle(color: Color(0xff4caf50))),
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => RegisterPage()));
-                              },
-                              child: Text("Register"),
-                              style: ButtonStyle(
-                                  backgroundColor:
-                                      WidgetStatePropertyAll(Colors.white),
-                                  foregroundColor: WidgetStatePropertyAll(
-                                      Color(0xff4caf50))),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                              child: ElevatedButton(
-                            onPressed: () {
-                              _loginUser();
+                          TextFormField(
+                            controller: _usernameController,
+                            decoration: _inputDecoration("Username"),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Username tidak boleh kosong";
+                              }
+                              return null;
                             },
-                            child: Text("Login"),
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  WidgetStatePropertyAll(Color(0xff4caf50)),
-                              foregroundColor:
-                                  WidgetStatePropertyAll(Colors.white),
-                            ),
-                          ))
+                          ),
+                          const SizedBox(height: 20),
+                          TextFormField(
+                            controller: _passwordController,
+                            decoration: _inputDecoration("Password"),
+                            obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Password tidak boleh kosong";
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const RegisterPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text("Register"),
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(Colors.white),
+                                    foregroundColor: MaterialStateProperty.all(
+                                      const Color(0xff4caf50),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () => _loginUser(),
+                                  child: const Text("Login"),
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(const Color(0xff4caf50)),
+                                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
-                      )
-                    ],
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
             Container(
-              margin: EdgeInsets.only(left: 20, right: 20),
+              margin: const EdgeInsets.only(left: 20, right: 20),
               height: 150,
               width: 150,
               child: Image.asset(
@@ -200,6 +184,25 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
       ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: Color(0xff4caf50), width: 2),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: Color(0xff4caf50), width: 2),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: Color(0xff4caf50), width: 2),
+      ),
+      labelText: label,
+      labelStyle: const TextStyle(color: Color(0xff4caf50)),
     );
   }
 }
