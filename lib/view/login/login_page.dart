@@ -1,5 +1,6 @@
 import 'package:asmaul_husna/database/instances/user_db_helper.dart';
 import 'package:asmaul_husna/main.dart';
+import 'package:asmaul_husna/view/admin/admin_home_page.dart';
 import 'package:asmaul_husna/view/register/register_page.dart';
 import 'package:flutter/material.dart';
 
@@ -23,17 +24,24 @@ class _LoginPageState extends State<LoginPage> {
     String username = _usernameController.text.trim();
     String password = _passwordController.text.trim();
 
-    var result = await _userDbHelper.loginUser(username, password);
-
-    if (result) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MyApp()));
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Selamat Datang $username')));
+    if (username == "admin" && password == "password") {
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => const AdminHomePage()));
     } else {
-      _usernameController.text = "";
-      _passwordController.text = "";
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Username atau Password salah')),
-      );
+      var result = await _userDbHelper.loginUser(username, password);
+
+      if (result) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const MyApp()));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Selamat Datang $username')));
+      } else {
+        _usernameController.text = "";
+        _passwordController.text = "";
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Username atau Password salah')),
+        );
+      }
     }
   }
 
@@ -102,7 +110,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                  padding:
+                      const EdgeInsets.only(left: 20, right: 20, bottom: 20),
                   child: SingleChildScrollView(
                     child: Form(
                       key: _formKey,
@@ -140,13 +149,15 @@ class _LoginPageState extends State<LoginPage> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const RegisterPage(),
+                                        builder: (context) =>
+                                            const RegisterPage(),
                                       ),
                                     );
                                   },
                                   child: const Text("Register"),
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(Colors.white),
+                                    backgroundColor:
+                                        MaterialStateProperty.all(Colors.white),
                                     foregroundColor: MaterialStateProperty.all(
                                       const Color(0xff4caf50),
                                     ),
@@ -159,8 +170,10 @@ class _LoginPageState extends State<LoginPage> {
                                   onPressed: () => _loginUser(),
                                   child: const Text("Login"),
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(const Color(0xff4caf50)),
-                                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                                    backgroundColor: MaterialStateProperty.all(
+                                        const Color(0xff4caf50)),
+                                    foregroundColor:
+                                        MaterialStateProperty.all(Colors.white),
                                   ),
                                 ),
                               ),

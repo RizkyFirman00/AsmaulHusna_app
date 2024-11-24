@@ -36,7 +36,7 @@ class UserDbHelper {
   Future<bool> loginUser(String username, String password) async {
     final box = await _getBox();
     return box.values.any(
-          (user) => user.username == username && user.password == password,
+      (user) => user.username == username && user.password == password,
     );
   }
 
@@ -45,21 +45,22 @@ class UserDbHelper {
     final box = await _getBox();
     final user = box.values.cast<ModelUser?>().firstWhere(
           (user) => user?.username == username,
-      orElse: () => null,
-    );
+          orElse: () => null,
+        );
     return user;
   }
 
   // Mendapatkan semua user
   Future<List<ModelUser>> getAllUsers() async {
     final box = await _getBox();
+    print("GET ALL USER FUNC: ${box.values.toList()}");
     return box.values.toList();
   }
 
   // Update user
   Future<void> updateUser(ModelUser user) async {
     final box = await _getBox();
-    await box.put(user.id, user); // Gunakan ID sebagai key untuk update
+    await box.put(user.id, user);
   }
 
   // Menghapus user

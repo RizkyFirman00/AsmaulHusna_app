@@ -192,28 +192,30 @@ class _RegisterPageState extends State<RegisterPage> {
                                     style: ButtonStyle(
                                         backgroundColor: WidgetStatePropertyAll(
                                             Color(0xff4caf50)),
-                                        foregroundColor:
-                                            WidgetStatePropertyAll(Colors.white)),
+                                        foregroundColor: WidgetStatePropertyAll(
+                                            Colors.white)),
                                   ),
                                 ),
                                 SizedBox(
                                   width: 10,
                                 ),
                                 Expanded(
-                                    child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) => LoginPage()));
-                                  },
-                                  child: Text("Login"),
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        WidgetStatePropertyAll(Colors.white),
-                                    foregroundColor:
-                                        WidgetStatePropertyAll(Color(0xff4caf50)),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  LoginPage()));
+                                    },
+                                    child: Text("Login"),
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          WidgetStatePropertyAll(Colors.white),
+                                      foregroundColor: WidgetStatePropertyAll(
+                                          Color(0xff4caf50)),
+                                    ),
                                   ),
-                                ))
+                                ),
                               ],
                             )
                           ],
