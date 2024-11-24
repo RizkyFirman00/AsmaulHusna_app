@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:asmaul_husna/model/model_user.dart';
 import 'package:asmaul_husna/view/login/login_page.dart';
 
+import '../../model/model_bookmark.dart';
+
 class AdminHomePage extends StatefulWidget {
   const AdminHomePage({super.key});
 
@@ -107,8 +109,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     subtitle: Text(user.email ?? 'No Email'),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete_rounded, color: Colors.red),
-                      onPressed: () async {
-                        await UserDbHelper().deleteUser(user.id!);
+                      onPressed: () {
+                        _showDeleteDialog(user.id!);
                         setState(() {
                           _usersFuture = UserDbHelper().getAllUsers();
                         });
@@ -120,6 +122,34 @@ class _AdminHomePageState extends State<AdminHomePage> {
             }
           },
         ),
+      ),
+    );
+  }
+
+  // Show delete confirmation dialog
+  void _showDeleteDialog(int id) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Hapus Data", style: TextStyle(fontSize: 18)),
+        content:
+            const Text("Yakin hapus data ini?", style: TextStyle(fontSize: 14)),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await UserDbHelper().deleteUser(id);
+              setState(() {
+                _usersFuture = UserDbHelper().getAllUsers();
+              });
+              Navigator.pop(context);
+            },
+            child: const Text("Hapus", style: TextStyle(fontSize: 14)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal", style: TextStyle(fontSize: 14)),
+          ),
+        ],
       ),
     );
   }
