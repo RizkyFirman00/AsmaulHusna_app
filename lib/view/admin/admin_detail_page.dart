@@ -2,33 +2,71 @@ import 'package:asmaul_husna/database/instances/user_db_helper.dart';
 import 'package:asmaul_husna/model/model_user.dart';
 import 'package:flutter/material.dart';
 
-class AdminDetailPage extends StatelessWidget {
-  final int id;
-  final String email;
-  final String phoneNumber;
-  final String username;
-  final String password;
+class AdminDetailPage extends StatefulWidget {
+  final int userId;
 
-  const AdminDetailPage({
-    super.key,
-    required this.id,
-    required this.email,
-    required this.phoneNumber,
-    required this.username,
-    required this.password,
-  });
+  const AdminDetailPage({super.key, required this.userId});
+
+  @override
+  State<AdminDetailPage> createState() => _AdminDetailPageState();
+}
+
+class _AdminDetailPageState extends State<AdminDetailPage> {
+  final UserDbHelper userDbHelper = UserDbHelper();
+
+  late TextEditingController _emailController;
+  late TextEditingController _phoneController;
+  late TextEditingController _usernameController;
+  late TextEditingController _passwordController;
+
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize controllers with empty values
+    _emailController = TextEditingController();
+    _phoneController = TextEditingController();
+    _usernameController = TextEditingController();
+    _passwordController = TextEditingController();
+
+    _getDataUserByEmail(widget.userId);
+  }
+
+  Future<void> _getDataUserByEmail(int userId) async {
+    if (userId != 0) {
+      try {
+        ModelUser? user = await userDbHelper.getUserById(userId);
+        if (user != null) {
+          setState(() {
+            _emailController.text = user.email ?? '';
+            _phoneController.text = user.phoneNumber ?? '';
+            _usernameController.text = user.username ?? '';
+            _passwordController.text = user.password ?? '';
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Failed to load user data."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController _emailController =
-        TextEditingController(text: email);
-    final TextEditingController _phoneController =
-        TextEditingController(text: phoneNumber);
-    final TextEditingController _usernameController =
-        TextEditingController(text: username);
-    final TextEditingController _passwordController =
-        TextEditingController(text: password);
-
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
@@ -54,7 +92,9 @@ class AdminDetailPage extends StatelessWidget {
           ),
         ),
       ),
-      body: Container(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,46 +129,11 @@ class AdminDetailPage extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () async {
-                      print("ID: $id");
-                      print("Email: ${_emailController.text}");
-                      print("Phone: ${_phoneController.text}");
-                      print("Username: ${_usernameController.text}");
-                      print("Password: ${_passwordController.text}");
-
-                      final updatedUser = ModelUser(
-                        id: id,
-                        email: _emailController.text,
-                        phoneNumber: _phoneController.text,
-                        username: _usernameController.text,
-                        password: _passwordController.text,
-                      );
-
-                      if (_emailController.text.isNotEmpty &&
-                          _phoneController.text.isNotEmpty &&
-                          _usernameController.text.isNotEmpty &&
-                          _passwordController.text.isNotEmpty) {
-                        await UserDbHelper().updateUser(updatedUser);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("User updated successfully!"),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                        Navigator.pop(context);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Failed to update user."),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    },
+                    onPressed: _updateUser,
                     child: const Text(
                       "Save",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 16),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xff4caf50),
@@ -161,5 +166,54 @@ class AdminDetailPage extends StatelessWidget {
       labelText: labelText,
       labelStyle: const TextStyle(color: Color(0xff4caf50)),
     );
+  }
+
+  Future<void> _updateUser() async {
+    final updatedUser = ModelUser(
+      id: widget.userId,
+      email: _emailController.text,
+      phoneNumber: _phoneController.text,
+      username: _usernameController.text,
+      password: _passwordController.text,
+    );
+
+    if (_emailController.text.isNotEmpty &&
+        _phoneController.text.isNotEmpty &&
+        _usernameController.text.isNotEmpty &&
+        _passwordController.text.isNotEmpty) {
+      try {
+        await userDbHelper.updateUser(updatedUser);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("User updated successfully!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context, true);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Failed to update user."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please fill out all fields."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _phoneController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }

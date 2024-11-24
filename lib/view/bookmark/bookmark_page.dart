@@ -36,7 +36,6 @@ class _BookmarkPageState extends State<BookmarkPage> {
   // Delete a bookmark and update the UI
   Future<void> _deleteBookmark(ModelBookmark bookmark, int index) async {
     await _databaseHelper.deleteBookmarkByNumber(bookmark.number!);
-    print("BOOKMARK DIAPUS: ${bookmark.number}");
     setState(() {
       _listBookmarks.removeAt(index);
       _isEmpty = _listBookmarks.isEmpty;
@@ -53,12 +52,9 @@ class _BookmarkPageState extends State<BookmarkPage> {
     return Scaffold(
       body: _isEmpty
           ? Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 250),
-          child: const Text(
-            "Ups, belum ada bookmark.",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
+        child: const Text(
+          "Ups, belum ada bookmark.",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       )
           : ListView.builder(
@@ -135,7 +131,6 @@ class _BookmarkPageState extends State<BookmarkPage> {
         actions: [
           TextButton(
             onPressed: () {
-              print("BOOKMARK DIAPUS: ${index}");
               _deleteBookmark(bookmark, index);
               Navigator.pop(context);
             },

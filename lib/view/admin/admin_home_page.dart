@@ -79,26 +79,22 @@ class _AdminHomePageState extends State<AdminHomePage> {
                 itemBuilder: (context, index) {
                   final user = users[index];
                   return ListTile(
-                    onTap: () {
-                      print("ID: ${users[index].id}");
-                      int? idUser = users[index].id;
-                      String emailUser = users[index].email.toString();
-                      String phoneNumberUser =
-                          users[index].phoneNumber.toString();
-                      String usernameUser = users[index].username.toString();
-                      String passwordUser = users[index].password.toString();
-                      Navigator.push(
+                    onTap: () async {
+                      print("ID: ${users[index].id.toString()}");
+                      int userId = users[index].id!;
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => AdminDetailPage(
-                            id: idUser!,
-                            email: emailUser,
-                            phoneNumber: phoneNumberUser,
-                            username: usernameUser,
-                            password: passwordUser,
+                            userId: userId,
                           ),
                         ),
                       );
+                      if (result == true) {
+                        setState(() {
+                          _usersFuture = UserDbHelper().getAllUsers();
+                        });
+                      }
                     },
                     leading: CircleAvatar(
                       child: Text(

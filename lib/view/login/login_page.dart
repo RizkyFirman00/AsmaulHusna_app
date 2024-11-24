@@ -1,8 +1,10 @@
 import 'package:asmaul_husna/database/instances/user_db_helper.dart';
 import 'package:asmaul_husna/main.dart';
+import 'package:asmaul_husna/tools/shared_preferences_users.dart';
 import 'package:asmaul_husna/view/admin/admin_home_page.dart';
 import 'package:asmaul_husna/view/register/register_page.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -25,16 +27,16 @@ class _LoginPageState extends State<LoginPage> {
     String password = _passwordController.text.trim();
 
     if (username == "admin" && password == "password") {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const AdminHomePage()));
+      SharedPreferencesUsers.setPassword(password);
+      SharedPreferencesUsers.setUsername(username);
+      SharedPreferencesUsers.setLoggedIn();
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AdminHomePage()));
     } else {
       var result = await _userDbHelper.loginUser(username, password);
 
       if (result) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const MyApp()));
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Selamat Datang $username')));
+        Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => const MyApp()));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Selamat Datang $username')));
       } else {
         _usernameController.text = "";
         _passwordController.text = "";

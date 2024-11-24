@@ -1,5 +1,7 @@
+import 'package:asmaul_husna/database/instances/user_db_helper.dart';
 import 'package:asmaul_husna/model/model_bookmark.dart';
 import 'package:asmaul_husna/model/model_user.dart';
+import 'package:asmaul_husna/tools/shared_preferences_users.dart';
 import 'package:asmaul_husna/view/bookmark/bookmark_page.dart';
 import 'package:asmaul_husna/view/home/home_page.dart';
 import 'package:asmaul_husna/view/hijaiyah/hijaiyah_page.dart';
@@ -37,6 +39,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
+  UserDbHelper _userDbHelper = UserDbHelper();
   TabController? tabController;
 
   @override
@@ -91,8 +94,9 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
               padding: const EdgeInsets.only(right: 5),
               child: IconButton(
                   onPressed: () {
+                    _userDbHelper.logoutUser();
                     Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => LoginPage()));
+                        MaterialPageRoute(builder: (context) => const LoginPage()));
                   },
                   icon: Icon(Icons.logout)),
             )

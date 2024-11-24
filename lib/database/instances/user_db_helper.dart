@@ -1,4 +1,5 @@
 import 'package:asmaul_husna/model/model_user.dart';
+import 'package:asmaul_husna/tools/shared_preferences_users.dart';
 import 'package:hive/hive.dart';
 
 class UserDbHelper {
@@ -23,8 +24,15 @@ class UserDbHelper {
   Future<bool> registerUser(ModelUser user) async {
     try {
       final box = await _getBox();
-      final key = user.email!;
-      await box.put(key, user);
+      int newId = 1;
+      if (box.isNotEmpty) {
+        final maxId = box.values
+            .map((user) => user.id ?? 0)
+            .reduce((max, id) => id > max ? id : max);
+        newId = maxId + 1;
+      }
+      user.id = newId;
+      await box.put(newId, user);
       return true;
     } catch (e) {
       print('Error registering user: $e');
@@ -35,25 +43,44 @@ class UserDbHelper {
   // Login user
   Future<bool> loginUser(String username, String password) async {
     final box = await _getBox();
-    return box.values.any(
-      (user) => user.username == username && user.password == password,
+    final user = box.values.cast<ModelUser?>().firstWhere(
+          (user) => user?.username == username && user?.password == password,
+      orElse: () => null,
     );
+
+    if (user != null) {
+      ModelUser _user = ModelUser(
+        id: user.id,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        username: user.username,
+        password: user.password
+      );
+      await SharedPreferencesUsers.isLoggedIn();
+      await SharedPreferencesUsers.saveLoginData(_user);
+      return true;
+    }
+    return false;
   }
 
-  // Mendapatkan user berdasarkan username
-  Future<ModelUser?> getUserByUsername(String username) async {
+  // Cek apakah user sudah login sebelumnya
+  Future<bool> isLoggedIn() async {
+    return await SharedPreferencesUsers.isLoggedIn();
+  }
+
+  // Mendapatkan user berdasarkan id
+  Future<ModelUser?> getUserById(int userId) async {
     final box = await _getBox();
     final user = box.values.cast<ModelUser?>().firstWhere(
-          (user) => user?.username == username,
-          orElse: () => null,
-        );
+          (user) => user?.id == userId,
+      orElse: () => null,
+    );
     return user;
   }
 
   // Mendapatkan semua user
   Future<List<ModelUser>> getAllUsers() async {
     final box = await _getBox();
-    print("GET ALL USER FUNC: ${box.values.toList()}");
     return box.values.toList();
   }
 
@@ -67,5 +94,10 @@ class UserDbHelper {
   Future<void> deleteUser(int id) async {
     final box = await _getBox();
     await box.delete(id);
+  }
+
+  // Logout user
+  Future<void> logoutUser() async {
+    await SharedPreferencesUsers.clearLoginData();
   }
 }
