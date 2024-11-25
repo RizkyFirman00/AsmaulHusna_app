@@ -15,15 +15,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   Color getRandomColor() {
     Random random = Random();
-    return Color.fromARGB(255, random.nextInt(200), random.nextInt(200), random.nextInt(200));
+    return Color.fromARGB(
+        255, random.nextInt(200), random.nextInt(200), random.nextInt(200));
   }
 
   //method get data assets
   Future<List<ModelHome>> readJsonData() async {
-    final jsonData = await rootBundle.rootBundle.loadString('assets/data/asmaul_husna.json');
+    final jsonData =
+        await rootBundle.rootBundle.loadString('assets/data/asmaul_husna.json');
     final listJson = json.decode(jsonData) as List<dynamic>;
     return listJson.map((e) => ModelHome.fromJson(e)).toList();
   }
@@ -38,39 +39,44 @@ class _HomePageState extends State<HomePage> {
               future: readJsonData(),
               builder: (context, data) {
                 if (data.hasError) {
-                  return Center(
-                      child: Text('${data.error}')
-                  );
+                  return Center(child: Text('${data.error}'));
                 } else if (data.hasData) {
                   var items = data.data as List<ModelHome>;
                   return ListView.builder(
                       itemCount: items.length,
                       itemBuilder: (context, index) {
+                        Color itemColor = getRandomColor();
                         return GestureDetector(
                           onTap: () {
                             int? strNo = items[index].number;
                             String strMeaning = items[index].meaning.toString();
                             String strName = items[index].name.toString();
-                            String strTranslate = items[index].transliteration.toString();
-                            String strKeterangan = items[index].keterangan.toString();
+                            String strTranslate =
+                                items[index].transliteration.toString();
+                            String strKeterangan =
+                                items[index].keterangan.toString();
                             String strAmalan = items[index].amalan.toString();
+                            String strSound =
+                                "sounds/asmaul_husna/asmaul_husna_${index + 1}.mp3";
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => DetailHomePage(
-                                    strNo: strNo!,
-                                    strMeaning: strMeaning,
-                                    strName: strName,
-                                    strTranslate: strTranslate,
-                                    strKeterangan: strKeterangan,
-                                    strAmalan: strAmalan),
+                                  strNo: strNo!,
+                                  strMeaning: strMeaning,
+                                  strName: strName,
+                                  strTranslate: strTranslate,
+                                  strKeterangan: strKeterangan,
+                                  strSound: strSound,
+                                  strAmalan: strAmalan,
+                                  strColor: itemColor,
+                                ),
                               ),
                             );
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)
-                            ),
+                                borderRadius: BorderRadius.circular(10)),
                             elevation: 5,
                             margin: const EdgeInsets.all(10),
                             child: Row(
@@ -81,7 +87,8 @@ class _HomePageState extends State<HomePage> {
                                     alignment: Alignment.center,
                                     children: [
                                       ClipRRect(
-                                        borderRadius: BorderRadius.circular(100),
+                                        borderRadius:
+                                            BorderRadius.circular(100),
                                         child: SvgPicture.asset(
                                           'assets/images/no.svg',
                                           width: 50,
@@ -94,8 +101,7 @@ class _HomePageState extends State<HomePage> {
                                           items[index].number.toString(),
                                           style: const TextStyle(
                                               fontSize: 14,
-                                              fontWeight: FontWeight.bold
-                                          ),
+                                              fontWeight: FontWeight.bold),
                                         ),
                                       )
                                     ],
@@ -106,17 +112,16 @@ class _HomePageState extends State<HomePage> {
                                     children: [
                                       ListTile(
                                         title: Text(
-                                          items[index].transliteration.toString(),
+                                          items[index]
+                                              .transliteration
+                                              .toString(),
                                           style: const TextStyle(
                                               fontSize: 20,
-                                              fontWeight: FontWeight.bold
-                                          ),
+                                              fontWeight: FontWeight.bold),
                                         ),
                                         subtitle: Text(
                                           items[index].meaning.toString(),
-                                          style: const TextStyle(
-                                              fontSize: 12
-                                          ),
+                                          style: const TextStyle(fontSize: 12),
                                         ),
                                       ),
                                     ],
@@ -127,8 +132,8 @@ class _HomePageState extends State<HomePage> {
                                   child: Text(
                                     items[index].name.toString(),
                                     style: TextStyle(
-                                        fontSize: 24,
-                                        color: getRandomColor(),
+                                      fontSize: 24,
+                                      color: getRandomColor(),
                                     ),
                                   ),
                                 ),
@@ -140,7 +145,8 @@ class _HomePageState extends State<HomePage> {
                 } else {
                   return const Center(
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xffffb6b9)),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Color(0xffffb6b9)),
                     ),
                   );
                 }

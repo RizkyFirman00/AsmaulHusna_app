@@ -2,12 +2,14 @@
   {
     "name": "\u0627",
     "transliteration": "Alif",
-    "number": 1
+    "number": 1,
+    "sound": "sounds/asmaul_husna/hijaiyah_1.mp3"
   },
   {
     "name": "\u0628",
     "transliteration": "Ba",
-    "number": 2
+    "number": 2,
+    "sound": "sounds/asmaul_husna/hijaiyah_1.mp3"
   },
   {
     "name": "\u062A",

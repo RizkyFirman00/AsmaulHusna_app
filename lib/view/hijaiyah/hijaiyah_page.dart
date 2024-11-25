@@ -20,12 +20,15 @@ class _HijaiyahPageState extends State<HijaiyahPage> {
         255, random.nextInt(200), random.nextInt(200), random.nextInt(200));
   }
 
-  // Method to get data from assets
   Future<List<ModelHijaiyah>> readJsonData() async {
     final jsonData =
         await rootBundle.rootBundle.loadString('assets/data/hijaiyah.json');
     final listJson = json.decode(jsonData) as List<dynamic>;
-    return listJson.map((e) => ModelHijaiyah.fromJson(e)).toList();
+    return listJson.map((e) {
+      var model = ModelHijaiyah.fromJson(e);
+      model.color = '#${Random().nextInt(0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+      return model;
+    }).toList();
   }
 
   @override
@@ -44,17 +47,6 @@ class _HijaiyahPageState extends State<HijaiyahPage> {
                   return ListView.builder(
                       itemCount: items.length,
                       itemBuilder: (context, index) {
-                        // Parse the color
-                        Color parsedColor;
-                        try {
-                          parsedColor = Color(int.parse(
-                              items[index].color!.replaceAll('0xff', '0x'),
-                              radix: 16));
-                        } catch (e) {
-                          parsedColor =
-                              const Color(0xff4caf50); // Fallback color
-                        }
-
                         return GestureDetector(
                           onTap: () {
                             String strName = items[index].name.toString();
@@ -128,9 +120,8 @@ class _HijaiyahPageState extends State<HijaiyahPage> {
                                     items[index].name.toString(),
                                     style: TextStyle(
                                         fontSize: 24,
-                                        color:
-                                            getRandomColor() // Displaying name with its respective color
-                                        ),
+                                        color: Color(
+                                            int.parse(items[index].color!.replaceAll("#", "0xFF")))),
                                   ),
                                 ),
                               ],

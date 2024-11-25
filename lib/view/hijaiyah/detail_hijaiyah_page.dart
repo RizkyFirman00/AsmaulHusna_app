@@ -16,19 +16,12 @@ class DetailHijaiyahPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color parsedColor;
-    try {
-      parsedColor = Color(int.parse(color.replaceAll('0xff', '0x'), radix: 16));
-    } catch (e) {
-      parsedColor = const Color(0xff4caf50);
-    }
-
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return [
             SliverAppBar(
-              backgroundColor: parsedColor,
+              backgroundColor: Color(0xff4caf50),
               expandedHeight: 250,
               pinned: true,
               floating: false,
@@ -66,8 +59,11 @@ class DetailHijaiyahPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 60,
                   fontWeight: FontWeight.bold,
-                  color:
-                      parsedColor, // Displaying name with its respective color
+                  color: Color(
+                    int.parse(
+                      color.replaceAll("#", "0xFF"),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 10),

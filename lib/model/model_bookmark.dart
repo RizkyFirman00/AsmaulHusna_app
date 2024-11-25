@@ -28,6 +28,9 @@ class ModelBookmark extends HiveObject {
   @HiveField(7)
   String? amalan;
 
+  @HiveField(7)
+  String? sound;
+
   ModelBookmark({
     this.id,
     this.number,
@@ -37,5 +40,6 @@ class ModelBookmark extends HiveObject {
     this.flag,
     this.keterangan,
     this.amalan,
+    this.sound,
   });
 }

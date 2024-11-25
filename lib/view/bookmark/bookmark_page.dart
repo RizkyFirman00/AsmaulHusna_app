@@ -53,7 +53,6 @@ class _BookmarkPageState extends State<BookmarkPage> {
     });
   }
 
-
   // Delete a bookmark and update the UI
   Future<void> _deleteBookmark(ModelBookmark bookmark, int index) async {
     await _databaseHelper.deleteBookmarkByNumber(bookmark.number!);
@@ -175,6 +174,7 @@ class _BookmarkPageState extends State<BookmarkPage> {
 
   // Navigate to detail page
   void _navigateToDetail(ModelBookmark bookmark) {
+    Color randomColor = _getRandomColor();
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -185,6 +185,8 @@ class _BookmarkPageState extends State<BookmarkPage> {
           strTranslate: bookmark.transliteration ?? '',
           strKeterangan: bookmark.keterangan ?? '',
           strAmalan: bookmark.amalan ?? '',
+          strSound: bookmark.sound ?? '',
+          strColor: randomColor,
         ),
       ),
     ).then((_) {

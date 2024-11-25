@@ -2,22 +2,32 @@ import 'package:asmaul_husna/database/instances/user_db_helper.dart';
 import 'package:asmaul_husna/model/model_bookmark.dart';
 import 'package:asmaul_husna/database/instances/bookmark_db_helper.dart';
 import 'package:asmaul_husna/tools/shared_preferences_users.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import '../../model/model_user.dart';
 
 class DetailHomePage extends StatefulWidget {
-  final String strMeaning, strName, strTranslate, strKeterangan, strAmalan;
+  final String strMeaning,
+      strName,
+      strTranslate,
+      strKeterangan,
+      strAmalan,
+      strSound;
+  final Color strColor;
   final int strNo;
 
-  const DetailHomePage(
-      {super.key,
-      required this.strMeaning,
-      required this.strName,
-      required this.strTranslate,
-      required this.strKeterangan,
-      required this.strAmalan,
-      required this.strNo});
+  const DetailHomePage({
+    super.key,
+    required this.strMeaning,
+    required this.strName,
+    required this.strTranslate,
+    required this.strKeterangan,
+    required this.strAmalan,
+    required this.strSound,
+    required this.strNo,
+    required this.strColor,
+  });
 
   @override
   State<DetailHomePage> createState() => _DetailHomePageState();
@@ -25,29 +35,27 @@ class DetailHomePage extends StatefulWidget {
 
 class _DetailHomePageState extends State<DetailHomePage> {
   bool isFlagged = false;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
   List<ModelBookmark> listBookmark = [];
   BookmarkDbHelper bookmarkDatabaseHelper = BookmarkDbHelper();
   UserDbHelper userDatabaseHelper = UserDbHelper();
-  late int strNo;
-  String? strMeaning, strName, strTranslate, strKeterangan, strAmalan;
 
   @override
   initState() {
     super.initState();
     _checkFlag();
-    strNo = widget.strNo;
-    strMeaning = widget.strMeaning;
-    strName = widget.strName;
-    strTranslate = widget.strTranslate;
-    strKeterangan = widget.strKeterangan;
-    strAmalan = widget.strAmalan;
+  }
+
+  Future<void> _playSound() async {
+    await _audioPlayer.play(AssetSource(widget.strSound));
   }
 
   Future<void> _checkFlag() async {
     final int? userId = await SharedPreferencesUsers.getUserId();
     final ModelUser? user = await userDatabaseHelper.getUserById(userId!);
     final List<int>? bookmarkUser = user?.bookmark_number;
-    bool alreadyBookmarked = (bookmarkUser ?? []).contains(strNo);
+    bool alreadyBookmarked = (bookmarkUser ?? []).contains(widget.strNo);
     setState(() {
       isFlagged = alreadyBookmarked;
     });
@@ -67,7 +75,7 @@ class _DetailHomePageState extends State<DetailHomePage> {
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
-                  strTranslate!,
+                  widget.strTranslate,
                   style: const TextStyle(fontSize: 20),
                 ),
                 titlePadding: const EdgeInsets.only(left: 52.0, bottom: 16.0),
@@ -89,17 +97,26 @@ class _DetailHomePageState extends State<DetailHomePage> {
                   height: 20,
                 ),
                 Center(
-                  child: Text(
-                    strName!,
-                    style: const TextStyle(
+                  child: TextButton(
+                    onPressed: () async {
+                      await _playSound();
+                    },
+                    child: Text(
+                      widget.strName,
+                      style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black),
+                        color: widget.strColor,
+                      ),
+                    ),
+                    style: ButtonStyle(
+                        shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)))),
                   ),
                 ),
                 Center(
                   child: Text(
-                    strTranslate!,
+                    widget.strTranslate,
                     style: const TextStyle(fontSize: 18, color: Colors.black),
                   ),
                 ),
@@ -107,14 +124,14 @@ class _DetailHomePageState extends State<DetailHomePage> {
                   height: 40,
                 ),
                 Text(
-                  strKeterangan!,
+                  widget.strKeterangan,
                   style: const TextStyle(fontSize: 16, color: Colors.black),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
                 Text(
-                  strAmalan!,
+                  widget.strAmalan,
                   textAlign: TextAlign.justify,
                   style: const TextStyle(fontSize: 16, color: Colors.black),
                 ),
@@ -130,34 +147,36 @@ class _DetailHomePageState extends State<DetailHomePage> {
           if (!isTapped) {
             isTapped = true;
             final int? userId = await SharedPreferencesUsers.getUserId();
-            final ModelUser? user = await userDatabaseHelper.getUserById(userId!);
+            final ModelUser? user =
+                await userDatabaseHelper.getUserById(userId!);
             final List<int>? bookmarkUser = user?.bookmark_number;
 
             if (bookmarkUser == null) {
               print("User has no bookmarks.");
             }
-            bool alreadyBookmarked = (bookmarkUser ?? []).contains(strNo);
-            print("ALREADYBOOKMARKED: $alreadyBookmarked");
+
+            bool alreadyBookmarked = (bookmarkUser ?? []).contains(widget.strNo);
 
             setState(() {
               isFlagged = alreadyBookmarked;
             });
 
             if (!isFlagged) {
-              await userDatabaseHelper.updateBookmarkForUser(userId, strNo);
+              await userDatabaseHelper.updateBookmarkForUser(userId, widget.strNo);
               await bookmarkDatabaseHelper.saveData(
                 ModelBookmark(
-                  number: strNo,
-                  name: strName,
-                  transliteration: strTranslate,
-                  meaning: strMeaning,
-                  keterangan: strKeterangan,
-                  amalan: strAmalan,
+                  number: widget.strNo,
+                  name: widget.strName,
+                  transliteration: widget.strTranslate,
+                  meaning: widget.strMeaning,
+                  keterangan: widget.strKeterangan,
+                  amalan: widget.strAmalan,
+                  sound: widget.strSound,
                   flag: 'Y',
                 ),
               );
             } else {
-              await userDatabaseHelper.deleteBookmarkFromUser(userId, strNo);
+              await userDatabaseHelper.deleteBookmarkFromUser(userId, widget.strNo);
             }
             Navigator.pop(context);
             isTapped = false;
@@ -169,7 +188,6 @@ class _DetailHomePageState extends State<DetailHomePage> {
           color: isFlagged ? Colors.yellow : Colors.white,
         ),
       ),
-
     );
   }
 }
