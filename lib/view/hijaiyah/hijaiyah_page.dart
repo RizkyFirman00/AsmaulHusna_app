@@ -26,7 +26,8 @@ class _HijaiyahPageState extends State<HijaiyahPage> {
     final listJson = json.decode(jsonData) as List<dynamic>;
     return listJson.map((e) {
       var model = ModelHijaiyah.fromJson(e);
-      model.color = '#${Random().nextInt(0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+      model.color =
+          '#${Random().nextInt(0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
       return model;
     }).toList();
   }
@@ -58,10 +59,12 @@ class _HijaiyahPageState extends State<HijaiyahPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => DetailHijaiyahPage(
-                                    name: strName,
-                                    transliteration: strTransliteration,
-                                    number: strNumber,
-                                    color: strColor),
+                                  name: strName,
+                                  transliteration: strTransliteration,
+                                  number: strNumber,
+                                  color: strColor,
+                                  sound: 'sounds/hijaiyah/hijaiyah_${index+1}.mp3',
+                                ),
                               ),
                             );
                           },
@@ -120,8 +123,9 @@ class _HijaiyahPageState extends State<HijaiyahPage> {
                                     items[index].name.toString(),
                                     style: TextStyle(
                                         fontSize: 24,
-                                        color: Color(
-                                            int.parse(items[index].color!.replaceAll("#", "0xFF")))),
+                                        color: Color(int.parse(items[index]
+                                            .color!
+                                            .replaceAll("#", "0xFF")))),
                                   ),
                                 ),
                               ],

@@ -39,5 +39,5 @@ flutter:
     - assets/data/
     - assets/images/
     - assets/sounds/asmaul_husna/
-#    - assets/sounds/hijaiyah
+    - assets/sounds/hijaiyah/
     - assets/splash_screen.png

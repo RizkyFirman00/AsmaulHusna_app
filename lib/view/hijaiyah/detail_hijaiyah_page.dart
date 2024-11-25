@@ -1,10 +1,12 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
-class DetailHijaiyahPage extends StatelessWidget {
+class DetailHijaiyahPage extends StatefulWidget {
   final String name;
   final String transliteration;
   final String number;
   final String color;
+  final String sound;
 
   const DetailHijaiyahPage({
     super.key,
@@ -12,7 +14,19 @@ class DetailHijaiyahPage extends StatelessWidget {
     required this.transliteration,
     required this.number,
     required this.color,
+    required this.sound,
   });
+
+  @override
+  State<DetailHijaiyahPage> createState() => _DetailHijaiyahPageState();
+}
+
+class _DetailHijaiyahPageState extends State<DetailHijaiyahPage> {
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  Future<void> _playSound() async {
+    await _audioPlayer.play(AssetSource(widget.sound));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +41,7 @@ class DetailHijaiyahPage extends StatelessWidget {
               floating: false,
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
-                  transliteration,
+                  widget.transliteration,
                   style: const TextStyle(fontSize: 20, color: Colors.white),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -54,21 +68,27 @@ class DetailHijaiyahPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-              Text(
-                name,
-                style: TextStyle(
-                  fontSize: 60,
-                  fontWeight: FontWeight.bold,
-                  color: Color(
-                    int.parse(
-                      color.replaceAll("#", "0xFF"),
+              TextButton(
+                onPressed: () async {_playSound();},
+                child: Text(
+                  widget.name,
+                  style: TextStyle(
+                    fontSize: 60,
+                    fontWeight: FontWeight.bold,
+                    color: Color(
+                      int.parse(
+                        widget.color.replaceAll("#", "0xFF"),
+                      ),
                     ),
                   ),
                 ),
+                style: ButtonStyle(
+                    shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)))),
               ),
               const SizedBox(height: 10),
               Text(
-                transliteration,
+                widget.transliteration,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -86,7 +106,7 @@ class DetailHijaiyahPage extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                'Huruf $transliteration adalah huruf ke-$number dalam urutan alfabet Hijaiyah. Simbol huruf ini adalah "$name", dan sering digunakan dalam bacaan bahasa Arab, termasuk dalam Al-Qur\'an. Mengenal huruf ini penting untuk membaca dan memahami teks Arab dengan baik.',
+                'Huruf ${widget.transliteration} adalah huruf ke-${widget.number} dalam urutan alfabet Hijaiyah. Simbol huruf ini adalah "${widget.name}", dan sering digunakan dalam bacaan bahasa Arab, termasuk dalam Al-Qur\'an. Mengenal huruf ini penting untuk membaca dan memahami teks Arab dengan baik.',
                 style: const TextStyle(fontSize: 16),
                 textAlign: TextAlign.justify,
               ),
