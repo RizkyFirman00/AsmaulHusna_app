@@ -71,6 +71,12 @@ class SharedPreferencesUsers {
   }
 
   // Set username
+  static Future<int?> getUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return await prefs.getInt(_keyUserId);
+  }
+
+  // Set username
   static Future<void> setUsername(String username) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyUsername, username);

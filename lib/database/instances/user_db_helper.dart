@@ -90,6 +90,40 @@ class UserDbHelper {
     await box.put(user.id, user);
   }
 
+  // Menambahkan atau memperbarui bookmark number untuk user
+  Future<void> updateBookmarkForUser(int userId, int newBookmarkNumber) async {
+    final box = await _getBox();
+    final user = box.get(userId);
+
+    if (user != null) {
+      user.bookmark_number ??= [];
+
+      if (!user.bookmark_number!.contains(newBookmarkNumber)) {
+        user.bookmark_number!.add(newBookmarkNumber);
+        await user.save();
+        print('Bookmark $newBookmarkNumber berhasil ditambahkan ke user dengan ID $userId.');
+      } else {
+        print('Bookmark $newBookmarkNumber sudah ada untuk user dengan ID $userId.');
+      }
+    } else {
+      print('User dengan ID $userId tidak ditemukan.');
+    }
+  }
+
+
+  // Delete number bookmark di user
+  Future<void> deleteBookmarkFromUser(int userId, int bookmarkNumber) async {
+    final box = await _getBox();
+    final user = box.get(userId);
+
+    if (user != null) {
+      user.bookmark_number?.remove(bookmarkNumber);
+      await user.save();
+    } else {
+      print('User dengan ID $userId tidak ditemukan.');
+    }
+  }
+
   // Menghapus user
   Future<void> deleteUser(int id) async {
     final box = await _getBox();

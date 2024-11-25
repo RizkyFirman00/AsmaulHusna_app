@@ -38,6 +38,16 @@ class BookmarkDbHelper {
     return box.values.toList();
   }
 
+  // Mendapatkan semua data bookmark
+  Future<ModelBookmark?> getBookmarkByNumber(int bookmarkNumber) async {
+    final box = await _getBox();
+    final bookmark = box.values.cast<ModelBookmark?>().firstWhere(
+          (bookmark) => bookmark?.number == bookmarkNumber,
+      orElse: () => null,
+    );
+    return bookmark;
+  }
+
   // Menghapus bookmark berdasarkan Number
   Future<void> deleteBookmarkByNumber(int number) async {
     final box = await _getBox();

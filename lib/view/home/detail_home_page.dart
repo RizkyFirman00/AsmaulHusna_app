@@ -1,6 +1,10 @@
+import 'package:asmaul_husna/database/instances/user_db_helper.dart';
 import 'package:asmaul_husna/model/model_bookmark.dart';
 import 'package:asmaul_husna/database/instances/bookmark_db_helper.dart';
+import 'package:asmaul_husna/tools/shared_preferences_users.dart';
 import 'package:flutter/material.dart';
+
+import '../../model/model_user.dart';
 
 class DetailHomePage extends StatefulWidget {
   final String strMeaning, strName, strTranslate, strKeterangan, strAmalan;
@@ -22,7 +26,8 @@ class DetailHomePage extends StatefulWidget {
 class _DetailHomePageState extends State<DetailHomePage> {
   bool isFlagged = false;
   List<ModelBookmark> listBookmark = [];
-  BookmarkDbHelper databaseHelper = BookmarkDbHelper();
+  BookmarkDbHelper bookmarkDatabaseHelper = BookmarkDbHelper();
+  UserDbHelper userDatabaseHelper = UserDbHelper();
   late int strNo;
   String? strMeaning, strName, strTranslate, strKeterangan, strAmalan;
 
@@ -39,14 +44,18 @@ class _DetailHomePageState extends State<DetailHomePage> {
   }
 
   Future<void> _checkFlag() async {
-    bool flagged = await databaseHelper.isFlagged(widget.strNo);
+    final int? userId = await SharedPreferencesUsers.getUserId();
+    final ModelUser? user = await userDatabaseHelper.getUserById(userId!);
+    final List<int>? bookmarkUser = user?.bookmark_number;
+    bool alreadyBookmarked = (bookmarkUser ?? []).contains(strNo);
     setState(() {
-      isFlagged = flagged;
+      isFlagged = alreadyBookmarked;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -118,16 +127,25 @@ class _DetailHomePageState extends State<DetailHomePage> {
         backgroundColor: Color(0xffFF4caf50),
         onPressed: () async {
           bool isTapped = false;
-
           if (!isTapped) {
             isTapped = true;
+            final int? userId = await SharedPreferencesUsers.getUserId();
+            final ModelUser? user = await userDatabaseHelper.getUserById(userId!);
+            final List<int>? bookmarkUser = user?.bookmark_number;
+
+            if (bookmarkUser == null) {
+              print("User has no bookmarks.");
+            }
+            bool alreadyBookmarked = (bookmarkUser ?? []).contains(strNo);
+            print("ALREADYBOOKMARKED: $alreadyBookmarked");
 
             setState(() {
-              isFlagged = !isFlagged;
+              isFlagged = alreadyBookmarked;
             });
 
-            if (isFlagged) {
-              await databaseHelper.saveData(
+            if (!isFlagged) {
+              await userDatabaseHelper.updateBookmarkForUser(userId, strNo);
+              await bookmarkDatabaseHelper.saveData(
                 ModelBookmark(
                   number: strNo,
                   name: strName,
@@ -139,7 +157,7 @@ class _DetailHomePageState extends State<DetailHomePage> {
                 ),
               );
             } else {
-              await databaseHelper.deleteBookmarkByNumber(strNo);
+              await userDatabaseHelper.deleteBookmarkFromUser(userId, strNo);
             }
             Navigator.pop(context);
             isTapped = false;
@@ -151,6 +169,7 @@ class _DetailHomePageState extends State<DetailHomePage> {
           color: isFlagged ? Colors.yellow : Colors.white,
         ),
       ),
+
     );
   }
 }

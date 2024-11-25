@@ -1,10 +1,9 @@
 import 'package:asmaul_husna/database/instances/user_db_helper.dart';
 import 'package:asmaul_husna/view/admin/admin_detail_page.dart';
+import 'package:asmaul_husna/view/admin/hive_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:asmaul_husna/model/model_user.dart';
 import 'package:asmaul_husna/view/login/login_page.dart';
-
-import '../../model/model_bookmark.dart';
 
 class AdminHomePage extends StatefulWidget {
   const AdminHomePage({super.key});
@@ -36,7 +35,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                 height: 25,
               ),
               const SizedBox(width: 10),
-              const Text(
+              Text(
                 "Admin Home Page",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,

@@ -19,5 +19,8 @@ class ModelUser extends HiveObject {
   @HiveField(4)
   String? password;
 
-  ModelUser({this.id, this.email, this.phoneNumber, this.username, this.password});
+  @HiveField(5)
+  List<int>? bookmark_number;
+
+  ModelUser({this.id, this.email, this.phoneNumber, this.username, this.password, this.bookmark_number});
 }
